@@ -19,6 +19,8 @@ import { getOverviewData, getGrowthData, getCourseData } from "@/services/overvi
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -59,6 +61,7 @@ const DashboardPage = () => {
   const chartData = growthData?.growth.map((item) => ({
     month: `${item.month}/${item.year}`,
     studentCount: item.studentCount,
+    totalRevenue: item.totalRevenue,
   })) || [];
 
   return (
@@ -213,41 +216,81 @@ const DashboardPage = () => {
         )}
 
         <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Charts & Insights</h2>
+          <h2 className="text-xl font-semibold mb-4">Insights</h2>
           <div className="space-y-6">
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle>User Growth</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Track the growth of students over time in 2025.
-                </p>
-              </CardHeader>
-              <CardContent>
-                {isGrowthLoading ? (
-                  <div>Loading...</div>
-                ) : (
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={chartData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar
-                          dataKey="studentCount"
-                          fill="#1E3A8A"
-                          name="Student Growth"
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="shadow-md">
+                <CardHeader>
+                  <CardTitle>User Growth</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Track the growth of students over time in 2025.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  {isGrowthLoading ? (
+                    <div>Loading...</div>
+                  ) : (
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={chartData}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar
+                            dataKey="studentCount"
+                            fill="#1E3A8A"
+                            name="Student Growth"
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-md">
+                <CardHeader>
+                  <CardTitle>Revenue Trend</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Monthly revenue growth in 2025.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  {isGrowthLoading ? (
+                    <div>Loading...</div>
+                  ) : (
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={chartData}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip formatter={(value) => ['$' + (Number(value)).toFixed(2), 'Revenue']} />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey="totalRevenue"
+                            stroke="#2E7D32"
+                            strokeWidth={2}
+                            name="Revenue ($)"
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="shadow-md">

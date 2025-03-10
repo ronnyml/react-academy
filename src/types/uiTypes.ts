@@ -18,6 +18,7 @@ export interface GrowthData {
     month: number;
     year: number;
     studentCount: number;
+    totalRevenue: number;
   }>;
 }
 
