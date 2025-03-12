@@ -10,17 +10,17 @@ import { getOverviewData, getGrowthData, getCourseData } from "@/services/overvi
 const DashboardPage: React.FC = () => {
   const { data: overview, isLoading: isOverviewLoading } = useQuery({
     queryKey: ["overview"],
-    queryFn: getOverviewData,
+    queryFn: getOverviewData
   });
 
   const { data: growthData, isLoading: isGrowthLoading } = useQuery({
     queryKey: ["growth"],
-    queryFn: getGrowthData,
+    queryFn: getGrowthData
   });
 
   const { data: courseData, isLoading: isCourseLoading } = useQuery({
     queryKey: ["courses"],
-    queryFn: getCourseData,
+    queryFn: getCourseData
   });
 
   const chartData = growthData?.growth.map((item) => ({

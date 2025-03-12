@@ -4,7 +4,7 @@ import { Filter, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import BaseLayout from "@/layouts/BaseLayout";
 import { courseService } from "@/services/courseService";
 import { CoursesPageList } from "@/components/CoursesPageList";
-import { CoursesPagination } from "@/components/Pagination";
+import { PaginationComponent } from "@/components/Pagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +17,6 @@ import {
 import { Category, PaginatedCourses } from "@/types/dataTypes";
 
 const COURSES_PER_PAGE = 20;
-const CACHE_TIME = 1000 * 60 * 10; // 10 minutes
-const STALE_TIME = 1000 * 60 * 5; // 5 minutes
 
 const CoursesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -43,9 +41,6 @@ const CoursesPage: React.FC = () => {
   } = useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: () => courseService.getCategories(),
-    staleTime: STALE_TIME,
-    gcTime: CACHE_TIME,
-    refetchOnWindowFocus: false,
   });
 
   const {
@@ -61,11 +56,7 @@ const CoursesPage: React.FC = () => {
         currentPage,
         COURSES_PER_PAGE,
         searchQuery
-      ),
-    staleTime: STALE_TIME,
-    gcTime: CACHE_TIME,
-    refetchOnWindowFocus: false,
-    placeholderData: (previousData) => previousData,
+      )
   });
 
   useEffect(() => {
@@ -79,7 +70,6 @@ const CoursesPage: React.FC = () => {
             COURSES_PER_PAGE,
             searchQuery
           ),
-        staleTime: STALE_TIME,
       });
     }
 
@@ -93,7 +83,6 @@ const CoursesPage: React.FC = () => {
             COURSES_PER_PAGE,
             searchQuery
           ),
-        staleTime: STALE_TIME,
       });
     }
   }, [currentPage, selectedCategory, searchQuery, queryClient, coursesResponse]);
@@ -101,13 +90,14 @@ const CoursesPage: React.FC = () => {
   useEffect(() => {
     if (isFetching) {
       setIsPageChanging(true);
-    } else {
+    } else if (!isFetching && isPageChanging) {
+      // Small delay to ensure smooth transition
       const timer = setTimeout(() => {
         setIsPageChanging(false);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [isFetching]);
+  }, [isFetching, isPageChanging]);
 
   const coursesData = coursesResponse?.courses || [];
   const totalPages = coursesResponse?.totalPages || 1;
@@ -144,8 +134,9 @@ const CoursesPage: React.FC = () => {
   };
 
   const showPagination = totalPages > 1;
+  const isInitialLoading = isCoursesLoading || isCategoriesLoading;
 
-  if (isCoursesLoading || isCategoriesLoading) {
+  if (isInitialLoading) {
     return (
       <BaseLayout>
         <div className="p-6 max-w-7xl mx-auto">
@@ -173,6 +164,8 @@ const CoursesPage: React.FC = () => {
       </BaseLayout>
     );
   }
+
+  const isLoadingState = isPageChanging && isFetching;
 
   return (
     <BaseLayout>
@@ -247,7 +240,7 @@ const CoursesPage: React.FC = () => {
             </div>
           </div>
 
-          {(isPageChanging || isFetching) && (
+          {isLoadingState && (
             <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
               <div className="bg-white/90 shadow-md rounded-full p-3 flex items-center justify-center">
                 <Loader2 className="h-6 w-6 text-[#1E3A8A] animate-spin" />
@@ -283,7 +276,7 @@ const CoursesPage: React.FC = () => {
               </div>
             </div>
 
-            {(isPageChanging || isFetching) ? (
+            {isLoadingState ? (
               <div className="mt-6 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, index) => (
                   <div key={index} className="bg-white rounded-xl shadow-sm p-4 animate-pulse">
@@ -304,7 +297,7 @@ const CoursesPage: React.FC = () => {
 
           {showPagination && (
             <div className="flex justify-center">
-              <CoursesPagination
+              <PaginationComponent
                 totalPages={totalPages}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
