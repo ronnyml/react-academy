@@ -20,12 +20,10 @@ export interface LoginData {
 }
 
 export interface LoginResponse {
-  token: {
-    success: boolean;
-    message: string;
-    data: {
-      token: string;
-      user: User;
-    };
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: User;
   };
 }
