@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Search, CheckCircle, XCircle } from "lucide-react";
 import BaseLayout from "@/layouts/BaseLayout";
-import { getUsersData, User, UsersResponse } from "@/services/userService";
+import { getUsersData } from "@/services/userService";
+import { User, UsersResponse } from "@/types/dataTypes";
 import { Input } from "@/components/ui/input";
 import {
   Table,
