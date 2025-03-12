@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Search, CheckCircle, XCircle } from "lucide-react";
 import BaseLayout from "@/layouts/BaseLayout";
@@ -15,21 +15,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PaginationComponent } from "@/components/Pagination";
 
 type RoleFilterType = "all" | "admin" | "teacher" | "student";
 type StatusFilterType = "all" | "active" | "inactive";
@@ -37,51 +29,107 @@ type StatusFilterType = "all" | "active" | "inactive";
 const ITEMS_PER_PAGE = 30;
 
 const UserPage: React.FC = () => {
-  const [currentFilteredPage, setCurrentFilteredPage] = useState<number>(1);
-  const initialPage = 1;
-  
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [loadingAllUsers, setLoadingAllUsers] = useState<boolean>(true);
-  const [totalUsers, setTotalUsers] = useState<number>(0);
-  
+  const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [roleFilter, setRoleFilter] = useState<RoleFilterType>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilterType>("all");
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [loadingAllUsers, setLoadingAllUsers] = useState<boolean>(true);
 
-  const { data, isLoading, isError } = useQuery<UsersResponse>({
-    queryKey: ["users", initialPage],
-    queryFn: () => getUsersData(initialPage),
-    placeholderData: (previousData) => previousData,
+  const { data: initialUsersResponse, isLoading, isError } = useQuery<UsersResponse>({
+    queryKey: ["users", currentPage],
+    queryFn: () => getUsersData(currentPage),
   });
 
   useEffect(() => {
-    if (data) {
-      setTotalUsers(data.totalUsers);
-      
-      if (data.users && data.totalPages > 1) {
+    if (initialUsersResponse) {
+      if (initialUsersResponse.totalPages > 1) {
         const fetchAllUsers = async () => {
-          let allFetchedUsers: User[] = [...data.users];
-
-          for (let page = 2; page <= data.totalPages; page++) {
-            try {
-              const pageData = await getUsersData(page);
-              allFetchedUsers = [...allFetchedUsers, ...pageData.users];
-            } catch (error) {
-              console.error(`Error fetching page ${page}:`, error);
+          let allFetchedUsers: User[] = [...initialUsersResponse.users];
+          for (let page = 1; page <= initialUsersResponse.totalPages; page++) {
+            if (page !== currentPage) {
+              const cachedData = queryClient.getQueryData<UsersResponse>(["users", page]);
+              if (cachedData) {
+                allFetchedUsers = [...allFetchedUsers, ...cachedData.users];
+              } else {
+                const pageData = await queryClient.fetchQuery({
+                  queryKey: ["users", page],
+                  queryFn: () => getUsersData(page),
+                });
+                allFetchedUsers = [...allFetchedUsers, ...pageData.users];
+              }
             }
           }
-          
           setAllUsers(allFetchedUsers);
           setLoadingAllUsers(false);
         };
-        
         fetchAllUsers();
-      } else if (data.users && data.totalPages === 1) {
-        setAllUsers(data.users);
+      } else {
+        setAllUsers(initialUsersResponse.users);
         setLoadingAllUsers(false);
       }
     }
-  }, [data]);
+  }, [initialUsersResponse, currentPage, queryClient]);
+
+  useEffect(() => {
+    if (initialUsersResponse && currentPage < initialUsersResponse.totalPages) {
+      queryClient.prefetchQuery({
+        queryKey: ["users", currentPage + 1],
+        queryFn: () => getUsersData(currentPage + 1),
+      });
+    }
+    if (currentPage > 1) {
+      queryClient.prefetchQuery({
+        queryKey: ["users", currentPage - 1],
+        queryFn: () => getUsersData(currentPage - 1),
+      });
+    }
+  }, [currentPage, initialUsersResponse, queryClient]);
+
+  const filteredUsers = useMemo(() => {
+    const usersToFilter = loadingAllUsers && initialUsersResponse?.users ? initialUsersResponse.users : allUsers;
+    return usersToFilter.filter((user: User) => {
+      const matchesSearch =
+        searchTerm === "" ||
+        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole =
+        roleFilter === "all" ||
+        (roleFilter === "admin" && user.roleId === 1) ||
+        (roleFilter === "teacher" && user.roleId === 2) ||
+        (roleFilter === "student" && user.roleId === 3);
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && user.active) ||
+        (statusFilter === "inactive" && !user.active);
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [allUsers, initialUsersResponse?.users, searchTerm, roleFilter, statusFilter, loadingAllUsers]);
+
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredUsers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredUsers, currentPage]);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)),
+    [filteredUsers]
+  );
+
+  const totalUsers = useMemo(
+    () => initialUsersResponse?.totalUsers || 0,
+    [initialUsersResponse]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter, statusFilter]);
+
+  const handlePageChange = (newPage: number): void => {
+    setCurrentPage(newPage);
+  };
 
   const getRoleName = (roleId: number): string => {
     switch (roleId) {
@@ -96,108 +144,6 @@ const UserPage: React.FC = () => {
     }
   };
 
-  const filteredUsers = useMemo(() => {
-    const usersToFilter = loadingAllUsers && data?.users ? data.users : allUsers;
-
-    return usersToFilter.filter((user: User) => {
-      const matchesSearch = 
-        searchTerm === "" ||
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesRole = 
-        roleFilter === "all" || 
-        (roleFilter === "admin" && user.roleId === 1) ||
-        (roleFilter === "teacher" && user.roleId === 2) ||
-        (roleFilter === "student" && user.roleId === 3);
-      
-      const matchesStatus = 
-        statusFilter === "all" || 
-        (statusFilter === "active" && user.active) ||
-        (statusFilter === "inactive" && !user.active);
-      
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-  }, [allUsers, data?.users, searchTerm, roleFilter, statusFilter, loadingAllUsers]);
-
-  const paginatedUsers = useMemo(() => {
-    const startIndex = (currentFilteredPage - 1) * ITEMS_PER_PAGE;
-    return filteredUsers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredUsers, currentFilteredPage]);
-
-  const totalFilteredPages = useMemo(() => {
-    return Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
-  }, [filteredUsers]);
-
-  useEffect(() => {
-    setCurrentFilteredPage(1);
-  }, [searchTerm, roleFilter, statusFilter]);
-
-  const handlePageChange = (newPage: number): void => {
-    setCurrentFilteredPage(newPage);
-  };
-
-  const renderPaginationItems = (): React.ReactNode => {
-    const items: React.ReactNode[] = [];
-
-    items.push(
-      <PaginationItem key="first">
-        <PaginationLink 
-          onClick={() => handlePageChange(1)}
-          isActive={currentFilteredPage === 1}
-        >
-          1
-        </PaginationLink>
-      </PaginationItem>
-    );
-    
-    if (currentFilteredPage > 3) {
-      items.push(
-        <PaginationItem key="ellipsis1">
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
-    }
-
-    for (let i = Math.max(2, currentFilteredPage - 1); i <= Math.min(totalFilteredPages - 1, currentFilteredPage + 1); i++) {
-      if (i <= 1 || i >= totalFilteredPages) continue;
-      items.push(
-        <PaginationItem key={i}>
-          <PaginationLink 
-            onClick={() => handlePageChange(i)}
-            isActive={currentFilteredPage === i}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-    
-    if (currentFilteredPage < totalFilteredPages - 2) {
-      items.push(
-        <PaginationItem key="ellipsis2">
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
-    }
-    
-    if (totalFilteredPages > 1) {
-      items.push(
-        <PaginationItem key="last">
-          <PaginationLink 
-            onClick={() => handlePageChange(totalFilteredPages)}
-            isActive={currentFilteredPage === totalFilteredPages}
-          >
-            {totalFilteredPages}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-    
-    return items;
-  };
-
   if (isLoading) {
     return (
       <BaseLayout>
@@ -209,7 +155,7 @@ const UserPage: React.FC = () => {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !initialUsersResponse) {
     return (
       <BaseLayout>
         <div className="p-6">
@@ -245,10 +191,9 @@ const UserPage: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            
             <div className="flex gap-4">
-              <Select 
-                value={roleFilter} 
+              <Select
+                value={roleFilter}
                 onValueChange={(value) => setRoleFilter(value as RoleFilterType)}
               >
                 <SelectTrigger className="w-32">
@@ -261,9 +206,8 @@ const UserPage: React.FC = () => {
                   <SelectItem value="student">Student</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <Select 
-                value={statusFilter} 
+              <Select
+                value={statusFilter}
                 onValueChange={(value) => setStatusFilter(value as StatusFilterType)}
               >
                 <SelectTrigger className="w-32">
@@ -329,25 +273,11 @@ const UserPage: React.FC = () => {
         </div>
 
         <div className="mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => handlePageChange(Math.max(1, currentFilteredPage - 1))}
-                  className={currentFilteredPage === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              
-              {renderPaginationItems()}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => handlePageChange(Math.min(totalFilteredPages, currentFilteredPage + 1))}
-                  className={currentFilteredPage === totalFilteredPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </BaseLayout>
