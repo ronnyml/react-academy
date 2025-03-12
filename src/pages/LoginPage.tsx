@@ -18,12 +18,16 @@ const LoginPage = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: (data: LoginData) => loginUser(data),
     onSuccess: (data) => {
-      const { token, user } = data?.token?.data || {};
-      if (token && user) {
-        login(token, user);
-        navigate("/dashboard");
+      if (data.success) {
+        const { token, user } = data.data;
+        if (token && user) {
+          login(token, user);
+          navigate("/dashboard");
+        } else {
+          setError("Invalid response format. Please try again.");
+        }
       } else {
-        setError("Invalid email or password. Please try again.");
+        setError(data.message || "Invalid email or password. Please try again.");
       }
     },
     onError: (error) => {
