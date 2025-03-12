@@ -1,5 +1,5 @@
 import React, { useState, ReactNode } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
+import Sidebar from "@/components/Sidebar";
 
 interface BaseLayoutProps {
   children: ReactNode;

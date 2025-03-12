@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   setIsSidebarCollapsed 
 }) => {
   const { user, logout } = useAuth();
+  const location = useLocation();
 
   const sidebarItems: SidebarItem[] = [
     { icon: <Menu />, label: "Dashboard", path: "/dashboard" },
@@ -41,6 +42,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     { icon: <Award />, label: "Certifications", path: "/certifications" },
     { icon: <Settings />, label: "Settings", path: "/settings" },
   ];
+
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   return (
     <div
@@ -75,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             key={item.label}
             to={item.path}
             className={`flex items-center p-4 hover:bg-[#2B4FC9] ${
-              item.label === "Dashboard" ? "bg-[#2B4FC9]" : ""
+              isActive(item.path) ? "bg-[#2B4FC9]" : ""
             }`}
           >
             <span className="w-6 h-6">{item.icon}</span>
