@@ -26,9 +26,9 @@ interface SidebarItem {
   path: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  isSidebarCollapsed, 
-  setIsSidebarCollapsed 
+const Sidebar: React.FC<SidebarProps> = ({
+  isSidebarCollapsed,
+  setIsSidebarCollapsed,
 }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -43,49 +43,66 @@ const Sidebar: React.FC<SidebarProps> = ({
     { icon: <Settings />, label: "Settings", path: "/settings" },
   ];
 
-  const isActive = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
-  };
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   return (
     <div
       className={`bg-[#1E3A8A] text-white transition-all duration-300 flex flex-col ${
         isSidebarCollapsed ? "w-16" : "w-64"
       } h-screen fixed left-0 z-10`}
+      role="complementary"
+      aria-label="Sidebar navigation"
     >
       <div className="relative border-b border-[#2B4FC9]">
-        <div className="p-4 flex items-center">
+        <div className="p-4 flex items-center justify-between">
           {!isSidebarCollapsed && (
             <h2 className="text-lg font-semibold mr-2">React Academy</h2>
           )}
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-[#2B4FC9] p-1 absolute right-2"
+            className="text-white hover:bg-[#2B4FC9] p-1 absolute right-2 focus:outline-none focus:ring-2 focus:ring-white"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            aria-expanded={!isSidebarCollapsed}
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {isSidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            {isSidebarCollapsed ? (
+              <ChevronRight size={18} aria-hidden="true" />
+            ) : (
+              <ChevronLeft size={18} aria-hidden="true" />
+            )}
           </Button>
         </div>
         {!isSidebarCollapsed && (
-          <p className="text-sm px-4 pb-3 text-gray-300">
+          <p className="text-sm px-4 pb-3 text-gray-300 truncate">
             {user?.firstName} {user?.lastName}
           </p>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4">
+      <nav
+        className="flex-1 overflow-y-auto py-4"
+        role="navigation"
+        aria-label="Main navigation"
+      >
         {sidebarItems.map((item) => (
           <Link
             key={item.label}
             to={item.path}
-            className={`flex items-center p-4 hover:bg-[#2B4FC9] ${
+            className={`flex items-center p-4 hover:bg-[#2B4FC9] focus:outline-none focus:ring-2 focus:ring-white ${
               isActive(item.path) ? "bg-[#2B4FC9]" : ""
             }`}
+            aria-current={isActive(item.path) ? "page" : undefined}
           >
-            <span className="w-6 h-6">{item.icon}</span>
+            <span className="w-6 h-6 flex-shrink-0" aria-hidden="true">
+              {item.icon}
+            </span>
             {!isSidebarCollapsed && (
-              <span className="ml-3 text-sm">{item.label}</span>
+              <span className="ml-3 text-sm truncate">{item.label}</span>
+            )}
+            {isSidebarCollapsed && (
+              <span className="sr-only">{item.label}</span> 
             )}
           </Link>
         ))}
@@ -94,9 +111,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-4 border-t border-[#2B4FC9] mt-auto">
         <button
           onClick={logout}
-          className="flex items-center p-4 w-full hover:bg-[#2B4FC9] text-sm"
+          className="flex items-center p-4 w-full hover:bg-[#2B4FC9] text-sm focus:outline-none focus:ring-2 focus:ring-white"
+          aria-label="Logout"
         >
-          <LogOut className="w-6 h-6" />
+          <LogOut className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
           {!isSidebarCollapsed && <span className="ml-3">Logout</span>}
         </button>
       </div>
