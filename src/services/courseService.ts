@@ -3,10 +3,19 @@ import { Course, Category, PaginatedCourses, ApiResponse } from "@/types/dataTyp
 import { API_BASE_URL, getAuthHeaders } from "@/utils/api";
 
 export const courseService = {
-  getCourses: async (categoryId?: number): Promise<PaginatedCourses> => {
-    const url = categoryId
-      ? `${API_BASE_URL}/courses?categoryId=${categoryId}`
-      : `${API_BASE_URL}/courses/`;
+  getCourses: async (
+    categoryId?: number,
+    page: number = 1,
+    limit: number = 20,
+    searchTerm: string = ""
+  ): Promise<PaginatedCourses> => {
+    let url = `${API_BASE_URL}/courses/?page=${page}&limit=${limit}`;
+    if (categoryId) {
+      url += `&categoryId=${categoryId}`;
+    }
+    if (searchTerm) {
+      url += `&search=${encodeURIComponent(searchTerm)}`;
+    }
     const response = await axios.get<ApiResponse<PaginatedCourses>>(url, getAuthHeaders());
     const { data } = response.data;
     return data;

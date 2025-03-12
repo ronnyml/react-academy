@@ -14,13 +14,27 @@ export interface Course {
   title: string;
   description: string;
   createdAt: string;
+  categoryId: number;
+  isFeatured?: boolean;
 }
 
 export interface CoursesPageListProps {
-  title: string;
-  description: string;
   courses: Course[];
   isLoading: boolean;
+  totalCourses: number;
+}
+
+export interface PaginatedCourses {
+  courses: Course[];
+  totalPages: number;
+  currentPage: number;
+  totalCourses: number;
+}
+
+export interface PaginationProps {
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 export interface User {
@@ -38,11 +52,4 @@ export interface UsersResponse {
   totalPages: number;
   currentPage: number;
   totalUsers: number;
-}
-
-export interface PaginatedCourses {
-  courses: Course[];
-  totalPages: number;
-  currentPage: number;
-  totalCourses: number;
 }
