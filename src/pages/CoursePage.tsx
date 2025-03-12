@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Filter, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import BaseLayout from "@/layouts/BaseLayout";
@@ -15,24 +15,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Category, PaginatedCourses } from "@/types/dataTypes";
+import { usePagination } from "@/hooks/usePagination";
+import { useSearch } from "@/hooks/useSearch";
+import { useFilter } from "@/hooks/useFilter";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 const COURSES_PER_PAGE = 20;
 
 const CoursesPage: React.FC = () => {
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isPageChanging, setIsPageChanging] = useState(false);
-
-  const hasActiveFilters = selectedCategory !== null || searchQuery !== "";
-  const handleSearch = () => {
-    setIsPageChanging(true);
-    setSearchQuery(searchTerm);
-    setSelectedCategory(null);
-    if (currentPage !== 1) setCurrentPage(1);
-  };
+  
+  const { 
+    currentPage, 
+    isPageChanging, 
+    handlePageChange 
+  } = usePagination();
+  
+  const {
+    searchTerm,
+    searchQuery,
+    setSearchTerm,
+    handleSearch,
+    handleKeyDown,
+    clearSearch
+  } = useSearch();
+  
+  const {
+    selectedFilter: selectedCategory,
+    handleFilterChange: handleCategoryChange,
+    clearFilter: clearCategory
+  } = useFilter<string>();
 
   const {
     data: categoriesData = [],
@@ -57,6 +69,11 @@ const CoursesPage: React.FC = () => {
         COURSES_PER_PAGE,
         searchQuery
       )
+  });
+
+  const { isLoading: isLoadingState } = useLoadingState({
+    isFetching,
+    isPageChanging
   });
 
   useEffect(() => {
@@ -87,52 +104,20 @@ const CoursesPage: React.FC = () => {
     }
   }, [currentPage, selectedCategory, searchQuery, queryClient, coursesResponse]);
 
-  useEffect(() => {
-    if (isFetching) {
-      setIsPageChanging(true);
-    } else if (!isFetching && isPageChanging) {
-      // Small delay to ensure smooth transition
-      const timer = setTimeout(() => {
-        setIsPageChanging(false);
-      }, 300);
-      return () => clearTimeout(timer);
+  const hasActiveFilters = selectedCategory !== null || searchQuery !== "";
+  
+  const clearAllFilters = () => {
+    clearSearch();
+    clearCategory();
+    if (currentPage !== 1) {
+      handlePageChange(1);
     }
-  }, [isFetching, isPageChanging]);
+  };
 
   const coursesData = coursesResponse?.courses || [];
   const totalPages = coursesResponse?.totalPages || 1;
   const totalCourses = coursesResponse?.totalCourses || 0;
-  const handlePageChange = (page: number) => {
-    if (page === currentPage) return;
-    setIsPageChanging(true);
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCategoryChange = (value: string) => {
-    setSearchTerm("");
-    setSearchQuery("");
-    setIsPageChanging(true);
-    setSelectedCategory(value === "all" ? null : value);
-    if (currentPage !== 1) setCurrentPage(1);
-  };
-
-  const clearAllFilters = () => {
-    setSearchTerm("");
-    setSearchQuery("");
-    setSelectedCategory(null);
-    if (currentPage !== 1) {
-      setIsPageChanging(true);
-      setCurrentPage(1);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
+  
   const showPagination = totalPages > 1;
   const isInitialLoading = isCoursesLoading || isCategoriesLoading;
 
@@ -164,8 +149,6 @@ const CoursesPage: React.FC = () => {
       </BaseLayout>
     );
   }
-
-  const isLoadingState = isPageChanging && isFetching;
 
   return (
     <BaseLayout>
