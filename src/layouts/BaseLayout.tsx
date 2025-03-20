@@ -1,9 +1,6 @@
-import React, { useState, ReactNode } from "react";
+import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
-
-interface BaseLayoutProps {
-  children: ReactNode;
-}
+import { BaseLayoutProps } from "@/types/dataTypes";
 
 const BaseLayout: React.FC<BaseLayoutProps> = ({ children }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);

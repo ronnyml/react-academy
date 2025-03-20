@@ -1,21 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Course {
-  id: string | number;
-  title: string;
-  description?: string;
-  enrollment_count?: number;
-  review_count?: number;
-}
-
-interface CourseListProps {
-  title: string;
-  description: string;
-  courses: Course[];
-  isLoading: boolean;
-}
+import { CourseListProps } from "@/types/dataTypes";
 
 export const CourseList: React.FC<CourseListProps> = ({
   title,

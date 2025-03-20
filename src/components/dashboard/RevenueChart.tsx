@@ -10,19 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface ChartDataItem {
-  month: string;
-  studentCount: number;
-  [key: string]: string | number;
-}
-
-interface RevenueChartProps {
-  title: string;
-  description: string;
-  data: ChartDataItem[];
-  isLoading: boolean;
-}
+import { RevenueChartProps } from "@/types/dataTypes";
 
 export const RevenueChart: React.FC<RevenueChartProps> = ({ 
   title, 

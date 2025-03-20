@@ -1,11 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  stats?: ReactNode;
-}
+import { StatCardProps } from "@/types/dataTypes";
 
 export const StatCard: React.FC<StatCardProps> = ({ title, value, stats }) => {
   return (

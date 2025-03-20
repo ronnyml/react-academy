@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CoursesPageListProps } from "@/types/dataTypes";
 import { Calendar, ChevronRight, Star } from "lucide-react";
+import { formatDateStr } from "@/utils/format";
 
 export const CoursesPageList: React.FC<CoursesPageListProps> = ({
   courses,
@@ -50,11 +51,7 @@ export const CoursesPageList: React.FC<CoursesPageListProps> = ({
                   <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
                     <div className="flex items-center text-xs text-gray-500">
                       <Calendar className="h-3 w-3 mr-1" />
-                      {new Date(course.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {formatDateStr(course.createdAt || "")}
                     </div>
                     <div className="flex items-center text-[#1E3A8A] text-xs font-medium">
                       <span>View course</span>

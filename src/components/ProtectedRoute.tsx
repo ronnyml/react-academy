@@ -9,7 +9,6 @@ const ProtectedRoute = () => {
   }
 
   if (!user) {
-    console.log("miau User:", user);
     return <Navigate to="/" replace />;
   }
 

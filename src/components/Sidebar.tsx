@@ -14,17 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-
-interface SidebarProps {
-  isSidebarCollapsed: boolean;
-  setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-interface SidebarItem {
-  icon: React.ReactNode;
-  label: string;
-  path: string;
-}
+import { SidebarProps, SidebarItem } from "@/types/dataTypes";
 
 const Sidebar: React.FC<SidebarProps> = ({
   isSidebarCollapsed,
@@ -50,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div
       className={`bg-[#1E3A8A] text-white transition-all duration-300 flex flex-col ${
         isSidebarCollapsed ? "w-16" : "w-64"
-      } h-screen fixed left-0 z-10`}
+      } fixed left-0 z-10`}
       role="complementary"
       aria-label="Sidebar navigation"
     >
