@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/useAuth";
 import { Button } from "@/components/ui/button";
+import { useTranslator } from "@/hooks/useTranslator";
 import {
   Menu,
   Users,
@@ -22,15 +23,16 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const { t } = useTranslator();
 
   const sidebarItems: SidebarItem[] = [
-    { icon: <Menu />, label: "Dashboard", path: "/dashboard" },
-    { icon: <Users />, label: "Users", path: "/users" },
-    { icon: <BookOpen />, label: "Courses", path: "/courses" },
-    { icon: <UserCheck />, label: "Enrollments", path: "/enrollments" },
-    { icon: <DollarSign />, label: "Payments", path: "/payments" },
-    { icon: <Award />, label: "Certifications", path: "/certifications" },
-    { icon: <Settings />, label: "Settings", path: "/settings" },
+    { icon: <Menu />, label: t("sidebar.dashboard"), path: "/dashboard" },
+    { icon: <Users />, label: t("sidebar.users"), path: "/users" },
+    { icon: <BookOpen />, label: t("sidebar.courses"), path: "/courses" },
+    { icon: <UserCheck />, label: t("sidebar.enrollments"), path: "/enrollments" },
+    { icon: <DollarSign />, label: t("sidebar.payments"), path: "/payments" },
+    { icon: <Award />, label: t("sidebar.certifications"), path: "/certifications" },
+    { icon: <Settings />, label: t("sidebar.settings"), path: "/settings" },
   ];
 
   const isActive = (path: string) =>
@@ -55,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className="text-white hover:bg-[#2B4FC9] p-1 absolute right-2 focus:outline-none focus:ring-2 focus:ring-white"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             aria-expanded={!isSidebarCollapsed}
-            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isSidebarCollapsed ? t("sidebar.expandSidebar") : t("sidebar.collapseSidebar")}
           >
             {isSidebarCollapsed ? (
               <ChevronRight size={18} aria-hidden="true" />
@@ -105,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           aria-label="Logout"
         >
           <LogOut className="w-6 h-6 flex-shrink-0" aria-hidden="true" />
-          {!isSidebarCollapsed && <span className="ml-3">Logout</span>}
+          {!isSidebarCollapsed && <span className="ml-3">{t("sidebar.logout")}</span>}
         </button>
       </div>
     </div>

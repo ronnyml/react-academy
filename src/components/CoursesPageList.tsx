@@ -5,22 +5,23 @@ import { Badge } from "@/components/ui/badge";
 import { CoursesPageListProps } from "@/types/dataTypes";
 import { Calendar, ChevronRight, Star } from "lucide-react";
 import { formatDateStr } from "@/utils/format";
+import { useTranslator } from "@/hooks/useTranslator";
 
 export const CoursesPageList: React.FC<CoursesPageListProps> = ({
   courses,
   isLoading,
 }) => {
+  const { t } = useTranslator();
   return (
     <Card className="shadow-lg border-0 bg-white/50 backdrop-blur-sm overflow-hidden">
       <CardContent className="pt-6">
         {isLoading ? (
           <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg animate-pulse">
-            <div className="text-gray-400">Loading courses...</div>
+            <div className="text-gray-400">{t("loading")}...</div>
           </div>
         ) : courses.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 bg-gray-50 rounded-lg">
-            <div className="text-gray-500 font-medium">No courses found.</div>
-            <p className="text-sm text-gray-400 mt-1">Try adjusting your search or filter criteria.</p>
+            <div className="text-gray-500 font-medium">{t("notFound")}</div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -39,7 +40,7 @@ export const CoursesPageList: React.FC<CoursesPageListProps> = ({
                     {course.isFeatured && (
                       <Badge variant="outline" className="ml-2 bg-amber-50 border-amber-200 text-amber-600 flex items-center">
                         <Star className="h-3 w-3 mr-1 fill-amber-500 text-amber-500" />
-                        Featured
+                        {t("courses.featured")}
                       </Badge>
                     )}
                   </div>
@@ -54,7 +55,7 @@ export const CoursesPageList: React.FC<CoursesPageListProps> = ({
                       {formatDateStr(course.createdAt || "")}
                     </div>
                     <div className="flex items-center text-[#1E3A8A] text-xs font-medium">
-                      <span>View course</span>
+                      <span>{t("courses.viewCourse")}</span>
                       <ChevronRight className="h-3 w-3 ml-1 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>

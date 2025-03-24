@@ -14,7 +14,6 @@ export const PaginationComponent: React.FC<PaginationProps> = ({
   currentPage, 
   onPageChange 
 }) => {
-
   const getPageNumbers = () => {
     const pages = [];
     if (currentPage > 3) {

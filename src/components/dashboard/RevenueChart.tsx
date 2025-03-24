@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RevenueChartProps } from "@/types/dataTypes";
+import { useTranslator } from "@/hooks/useTranslator";
 
 export const RevenueChart: React.FC<RevenueChartProps> = ({ 
   title, 
@@ -18,6 +19,7 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({
   data, 
   isLoading 
 }) => {
+  const { t } = useTranslator();
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -26,7 +28,7 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div>Loading...</div>
+          <div>{t("loading")}...</div>
         ) : (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -44,7 +46,7 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({
                   dataKey="totalRevenue"
                   stroke="#2E7D32"
                   strokeWidth={2}
-                  name="Revenue ($)"
+                  name={`${t("dashboard.revenue")} ($)`}
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}
                 />

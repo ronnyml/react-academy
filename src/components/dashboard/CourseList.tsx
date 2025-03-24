@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CourseListProps } from "@/types/dataTypes";
+import { useTranslator } from "@/hooks/useTranslator";
 
 export const CourseList: React.FC<CourseListProps> = ({
   title,
@@ -9,6 +10,7 @@ export const CourseList: React.FC<CourseListProps> = ({
   courses,
   isLoading,
 }) => {
+  const { t } = useTranslator();
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -17,7 +19,7 @@ export const CourseList: React.FC<CourseListProps> = ({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div>Loading...</div>
+          <div>{t("loading")}...</div>
         ) : (
           <div className="space-y-4">
             {courses.map((course) => (
@@ -35,10 +37,10 @@ export const CourseList: React.FC<CourseListProps> = ({
                   )}
                   <div className="flex gap-4 text-xs text-gray-500">
                     {course.enrollment_count && (
-                      <span>Enrollments: {course.enrollment_count}</span>
+                      <span>{t("dashboard.enrollments")}: {course.enrollment_count}</span>
                     )}
                     {course.review_count && (
-                      <span>Reviews: {course.review_count}</span>
+                      <span>{t("dashboard.reviews")}: {course.review_count}</span>
                     )}
                   </div>
                 </div>

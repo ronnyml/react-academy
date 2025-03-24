@@ -6,6 +6,9 @@ import BaseLayout from "@/layouts/BaseLayout";
 import { getUsersData } from "@/services/userService";
 import { User, UsersResponse } from "@/types/dataTypes";
 import { Input } from "@/components/ui/input";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import ErrorScreen from "@/components/ErrorScreen";
+import { useTranslator } from "@/hooks/useTranslator";
 import {
   Table,
   TableBody,
@@ -36,6 +39,7 @@ const UserPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilterType>("all");
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loadingAllUsers, setLoadingAllUsers] = useState<boolean>(true);
+  const { t } = useTranslator();
 
   const { data: initialUsersResponse, isLoading, isError } = useQuery<UsersResponse>({
     queryKey: ["users", currentPage],
@@ -134,46 +138,32 @@ const UserPage: React.FC = () => {
   const getRoleName = (roleId: number): string => {
     switch (roleId) {
       case 1:
-        return "Admin";
+        return t("users.admin");
       case 2:
-        return "Teacher";
+        return t("users.teacher");
       case 3:
-        return "Student";
+        return t("users.student");
       default:
-        return "Unknown";
+        return "";
     }
   };
 
   if (isLoading) {
-    return (
-      <BaseLayout>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold mb-4 text-[#1E3A8A]">Users</h1>
-          <p className="text-[#1E3A8A]">Loading users data...</p>
-        </div>
-      </BaseLayout>
-    );
+    return <LoadingSpinner />;
   }
 
   if (isError || !initialUsersResponse) {
-    return (
-      <BaseLayout>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold mb-4 text-[#1E3A8A]">Users</h1>
-          <p className="text-red-500">Error loading users data. Please try again later.</p>
-        </div>
-      </BaseLayout>
-    );
+    return <ErrorScreen title={t("users.title")} />;
   }
 
   return (
     <BaseLayout>
       <div className="p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h1 className="text-2xl font-bold text-[#1E3A8A]">Users</h1>
+          <h1 className="text-2xl font-bold text-[#1E3A8A]">{t("users.title")}</h1>
           <div className="text-sm mt-2 sm:mt-0 text-[#1E3A8A]">
-            Showing <span className="font-semibold">{paginatedUsers.length}</span> of{" "}
-            <span className="font-semibold">{filteredUsers.length}</span> filtered users
+            <span className="font-semibold">{paginatedUsers.length}</span> {t("of")}{" "}
+            <span className="font-semibold">{filteredUsers.length}</span> {t("users.filteredUsers")}
             {filteredUsers.length !== totalUsers && (
               <span> (Total: <span className="font-semibold">{totalUsers}</span>)</span>
             )}
@@ -185,7 +175,7 @@ const UserPage: React.FC = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#1E3A8A]" />
               <Input
-                placeholder="Search users..."
+                placeholder={t("search")}
                 className="pl-10 py-2 border-[#1E3A8A]/20 focus:border-[#1E3A8A] focus:ring-[#1E3A8A]/40 text-[#1E3A8A] placeholder:text-[#1E3A8A]/60 rounded-md"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -196,27 +186,27 @@ const UserPage: React.FC = () => {
                 value={roleFilter}
                 onValueChange={(value) => setRoleFilter(value as RoleFilterType)}
               >
-                <SelectTrigger className="w-32 border-[#1E3A8A]/20 text-[#1E3A8A] focus:ring-[#1E3A8A]/40 bg-white rounded-md">
+                <SelectTrigger className="w-40 border-[#1E3A8A]/20 text-[#1E3A8A] focus:ring-[#1E3A8A]/40 bg-white rounded-md">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#1E3A8A]/20">
-                  <SelectItem value="all" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">All Roles</SelectItem>
-                  <SelectItem value="admin" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">Admin</SelectItem>
-                  <SelectItem value="teacher" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">Teacher</SelectItem>
-                  <SelectItem value="student" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">Student</SelectItem>
+                  <SelectItem value="all" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("users.allRoles")}</SelectItem>
+                  <SelectItem value="admin" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("users.admin")}</SelectItem>
+                  <SelectItem value="teacher" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("users.teacher")}</SelectItem>
+                  <SelectItem value="student" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("users.student")}</SelectItem>
                 </SelectContent>
               </Select>
               <Select
                 value={statusFilter}
                 onValueChange={(value) => setStatusFilter(value as StatusFilterType)}
               >
-                <SelectTrigger className="w-32 border-[#1E3A8A]/20 text-[#1E3A8A] focus:ring-[#1E3A8A]/40 bg-white rounded-md">
+                <SelectTrigger className="w-40 border-[#1E3A8A]/20 text-[#1E3A8A] focus:ring-[#1E3A8A]/40 bg-white rounded-md">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#1E3A8A]/20">
-                  <SelectItem value="all" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">All Status</SelectItem>
-                  <SelectItem value="active" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">Active</SelectItem>
-                  <SelectItem value="inactive" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">Inactive</SelectItem>
+                  <SelectItem value="all" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("users.allStatus")}</SelectItem>
+                  <SelectItem value="active" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("active")}</SelectItem>
+                  <SelectItem value="inactive" className="text-[#1E3A8A] hover:bg-[#1E3A8A]/10">{t("inactive")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -227,18 +217,18 @@ const UserPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-[#1E3A8A] text-white hover:bg-[#1E3A8A]">
-                <TableHead className="text-white font-semibold py-3">Name</TableHead>
-                <TableHead className="text-white font-semibold py-3">Email</TableHead>
-                <TableHead className="text-white font-semibold py-3">Role</TableHead>
-                <TableHead className="text-white font-semibold py-3">Created</TableHead>
-                <TableHead className="text-white font-semibold py-3 text-center">Status</TableHead>
+                <TableHead className="text-white font-semibold py-3">{t("users.name")}</TableHead>
+                <TableHead className="text-white font-semibold py-3">{t("users.email")}</TableHead>
+                <TableHead className="text-white font-semibold py-3">{t("users.role")}</TableHead>
+                <TableHead className="text-white font-semibold py-3">{t("users.created")}</TableHead>
+                <TableHead className="text-white font-semibold py-3 text-center">{t("users.status")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loadingAllUsers && filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6 text-[#1E3A8A]">
-                    Loading all user data...
+                  {t("loading")}...
                   </TableCell>
                 </TableRow>
               ) : paginatedUsers.length > 0 ? (
@@ -269,7 +259,7 @@ const UserPage: React.FC = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6 text-[#1E3A8A]">
-                    No users found. Try adjusting your search or filters.
+                  {t("notFound")}
                   </TableCell>
                 </TableRow>
               )}

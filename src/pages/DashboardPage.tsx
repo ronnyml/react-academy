@@ -6,8 +6,10 @@ import { GrowthChart } from "@/components/dashboard/GrowthChart";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { CourseList } from "@/components/dashboard/CourseList";
 import { getOverviewData, getGrowthData, getCourseData } from "@/services/overviewService";
+import { useTranslator } from "@/hooks/useTranslator";
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslator();
   const { data: overview, isLoading: isOverviewLoading } = useQuery({
     queryKey: ["overview"],
     queryFn: getOverviewData
@@ -31,68 +33,68 @@ const DashboardPage: React.FC = () => {
 
   return (
     <BaseLayout>
-      <h1 className="text-2xl font-bold text-blue-600 mb-6">Overview</h1>
+      <h1 className="text-2xl font-bold text-blue-600 mb-6">{t("dashboard.overview")}</h1>
 
       {isOverviewLoading ? (
-        <div>Loading...</div>
+        <div>{t("loading")}...</div>
       ) : overview && (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           <StatCard
-            title="Teachers"
+            title={t("dashboard.teachers")}
             value={overview.teachers}
             stats={
               <div className="flex justify-between text-sm">
                 <span className="text-green-600">
-                  Active: {overview.active_teachers}
+                  {t("active")}: {overview.active_teachers}
                 </span>
                 <span className="text-red-600">
-                  Inactive: {overview.inactive_teachers}
+                  {t("inactive")}: {overview.inactive_teachers}
                 </span>
               </div>
             }
           />
 
           <StatCard
-            title="Students"
+            title={t("dashboard.students")}
             value={overview.students}
             stats={
               <div className="flex justify-between text-sm">
                 <span className="text-green-600">
-                  Active: {overview.active_students}
+                  {t("active")}: {overview.active_students}
                 </span>
                 <span className="text-red-600">
-                  Inactive: {overview.inactive_students}
+                  {t("inactive")}: {overview.inactive_students}
                 </span>
               </div>
             }
           />
 
           <StatCard
-            title="Revenue"
+            title={t("dashboard.revenue")}
             value={`$${overview.total_revenue}`}
             stats={
               <p className="text-sm text-muted-foreground mt-1">
-                This month: ${overview.total_revenue_current_month}
+                {t("dashboard.thisMonth")}: ${overview.total_revenue_current_month}
               </p>
             }
           />
 
           <StatCard
-            title="Courses"
+            title={t("dashboard.courses")}
             value={overview.total_courses}
             stats={
               <p className="text-sm text-muted-foreground mt-1">
-                Avg Rating: {overview.avg_course_rating}/5
+                {t("dashboard.avgRating")}: {overview.avg_course_rating}/5
               </p>
             }
           />
 
           <StatCard
-            title="Enrollments"
+            title={t("dashboard.enrollments")}
             value={overview.total_enrollments}
             stats={
               <p className="text-sm text-muted-foreground mt-1">
-                This month: {overview.total_enrollments_current_month}
+                {t("dashboard.thisMonth")}: {overview.total_enrollments_current_month}
               </p>
             }
           />
@@ -100,19 +102,19 @@ const DashboardPage: React.FC = () => {
       )}
 
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Insights</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("dashboard.insights")}</h2>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <GrowthChart
-              title="User Growth"
-              description="Track the growth of students over time in 2025."
+              title={t("dashboard.growChartTitle")}
+              description={t("dashboard.growChartDescription")}
               data={chartData}
               isLoading={isGrowthLoading}
             />
 
             <RevenueChart
-              title="Revenue Trend"
-              description="Monthly revenue growth in 2025."
+              title={t("dashboard.revenueChartTitle")}
+              description={t("dashboard.revenueChartDescription")}
               data={chartData}
               isLoading={isGrowthLoading}
             />
@@ -120,15 +122,15 @@ const DashboardPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <CourseList
-              title="Most Popular Courses"
-              description="Top 5 courses by enrollment."
+              title={t("dashboard.mostPopularTitle")}
+              description={t("dashboard.mostPopularDescription")}
               courses={courseData?.courses.most_popular || []}
               isLoading={isCourseLoading}
             />
 
             <CourseList
-              title="Top Rated Courses"
-              description="Top 5 courses by good reviews."
+              title={t("dashboard.topRatedTitle")}
+              description={t("dashboard.topRatedDescription")}
               courses={courseData?.courses.top_rated || []}
               isLoading={isCourseLoading}
             />

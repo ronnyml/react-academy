@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GrowthChartProps } from "@/types/dataTypes";
+import { useTranslator } from "@/hooks/useTranslator";
 
 export const GrowthChart: React.FC<GrowthChartProps> = ({ 
   title, 
@@ -18,6 +19,7 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
   data, 
   isLoading 
 }) => {
+  const { t } = useTranslator();
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -26,7 +28,7 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div>Loading...</div>
+          <div>{t("loading")}...</div>
         ) : (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -42,7 +44,7 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
                 <Bar
                   dataKey="studentCount"
                   fill="#1E3A8A"
-                  name="Student Growth"
+                  name={t("dashboard.growChartTitle")}
                 />
               </BarChart>
             </ResponsiveContainer>
