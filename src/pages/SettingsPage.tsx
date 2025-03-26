@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorScreen from "@/components/ErrorScreen";
+import { useTranslator } from "@/hooks/useTranslator";
 
 const LANGUAGES = [
   { value: "es", label: "Español" },
@@ -41,6 +42,7 @@ const SettingsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [editedSettings, setEditedSettings] = useState<Partial<Settings>>({});
+  const { t, changeLanguage } = useTranslator();
 
   const {
     data: Settings,
@@ -48,7 +50,7 @@ const SettingsPage: React.FC = () => {
     error,
     refetch
   } = useQuery({
-    queryKey: ["Settings", 1],
+    queryKey: ["Settings"],
     queryFn: () => settingsService.getSettings()
   });
 
@@ -61,19 +63,19 @@ const SettingsPage: React.FC = () => {
 
       setIsEditing(false);
       setEditedSettings({});
-      toast.success("Settings Updated", {
-        description: "Settings information has been successfully updated.",
+      toast.success(t("updated"), {
+        description: t("updatedDescription"),
       });
     },
     onError: () => {
-      toast.error("Update Failed", {
-        description: "There was an error updating the Settings information.",
+      toast.error(t("updateFailed"), {
+        description: t("updateFailedDescription"),
       });
     }
   });
 
   if (isLoading)return <LoadingSpinner />;
-  if (error) return <ErrorScreen title="Settings" />;
+  if (error) return <ErrorScreen title={t("settings.title")} />;
 
   const handleInputChange = (key: keyof Settings, value: string) => {
     setEditedSettings(prev => ({
@@ -87,6 +89,7 @@ const SettingsPage: React.FC = () => {
       ...Settings,
       ...editedSettings
     };
+    changeLanguage(updatedData.defaultLanguage);
     updateMutation.mutate(updatedData);
   };
 
@@ -96,14 +99,14 @@ const SettingsPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">
-              Settings
+            {t("settings.title")}
             </CardTitle>
             {!isEditing ? (
               <Button
                 variant="outline"
                 onClick={() => setIsEditing(true)}
               >
-                <Edit className="mr-2" />Edit
+                <Edit className="mr-2" />{t("edit")}
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -114,7 +117,7 @@ const SettingsPage: React.FC = () => {
                     setEditedSettings({});
                   }}
                 >
-                  <X className="mr-2" />Cancel
+                  <X className="mr-2" />{t("cancel")}
                 </Button>
                 <Button
                   onClick={handleSave}
@@ -125,7 +128,7 @@ const SettingsPage: React.FC = () => {
                   ) : (
                     <Save className="mr-2" />
                   )}
-                  Save
+                  {t("save")}
                 </Button>
               </div>
             )}
@@ -134,7 +137,7 @@ const SettingsPage: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center">
                 <Label className="flex items-center w-32 mr-4">
-                  <Building2 className="mr-2" />Company:
+                  <Building2 className="mr-2" />{t("settings.company")}:
                 </Label>
                 {isEditing ? (
                   <div className="flex-grow">
@@ -151,7 +154,7 @@ const SettingsPage: React.FC = () => {
 
               <div className="flex items-center">
                 <Label className="flex items-center w-32 mr-4">
-                  <Mail className="mr-2" />Email:
+                  <Mail className="mr-2" />{t("settings.email")}:
                 </Label>
                 {isEditing ? (
                   <div className="flex-grow">
@@ -173,7 +176,7 @@ const SettingsPage: React.FC = () => {
 
               <div className="flex items-center">
                 <Label className="flex items-center w-32 mr-4">
-                  <Link className="mr-2" />Website:
+                  <Link className="mr-2" />{t("settings.website")}:
                 </Label>
                 {isEditing ? (
                   <div className="flex-grow">
@@ -224,16 +227,18 @@ const SettingsPage: React.FC = () => {
 
               <div className="flex items-center">
                 <Label className="flex items-center w-32 mr-4">
-                  <Globe className="mr-2" />Language:
+                  <Globe className="mr-2" />{t("settings.language")}:
                 </Label>
                 {isEditing ? (
                   <div className="flex-grow">
                     <Select
                       value={editedSettings.defaultLanguage ?? Settings?.defaultLanguage}
-                      onValueChange={(value) => handleInputChange("defaultLanguage", value)}
+                      onValueChange={(value) => {
+                        handleInputChange("defaultLanguage", value)
+                      }}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Language" />
+                        <SelectValue placeholder={t("settings.selectLanguage")} />
                       </SelectTrigger>
                       <SelectContent>
                         {LANGUAGES.map((lang) => (
@@ -251,7 +256,7 @@ const SettingsPage: React.FC = () => {
 
               <div className="flex items-center">
                 <Label className="flex items-center w-32 mr-4">
-                  <Clock className="mr-2" />Timezone:
+                  <Clock className="mr-2" />{t("settings.timezone")}:
                 </Label>
                 {isEditing ? (
                   <div className="flex-grow">
@@ -260,7 +265,7 @@ const SettingsPage: React.FC = () => {
                       onValueChange={(value) => handleInputChange("timezone", value)}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Timezone" />
+                        <SelectValue placeholder={t("settings.selectTimezone")} />
                       </SelectTrigger>
                       <SelectContent>
                         {LATIN_AMERICAN_TIMEZONES.map((tz) => (
@@ -278,7 +283,7 @@ const SettingsPage: React.FC = () => {
 
               <div className="flex items-center">
                 <Label className="flex items-center w-32 mr-4">
-                  <Palette className="mr-2" />Theme Color:
+                  <Palette className="mr-2" />{t("settings.themeColor")}:
                 </Label>
                 {isEditing ? (
                   <div className="flex items-center gap-2 flex-grow">
@@ -295,7 +300,7 @@ const SettingsPage: React.FC = () => {
                           className="w-full"
                           value={editedSettings.themeColor ?? Settings?.themeColor ?? "#000000"}
                           onChange={(e) => handleInputChange("themeColor", e.target.value)}
-                          placeholder="Enter Hex Color"
+                          placeholder={t("settings.enterHexColor")}
                         />
                       </div>
                     </div>
