@@ -159,7 +159,7 @@ const CoursesPage: React.FC = () => {
   }, [selectedCategoryName, searchQuery, t]);
 
   if (isInitialLoading) {
-    return <LoadingScreen />;
+    return <LoadingSpinner />;
   }
 
   if (isCoursesError || isCategoriesError) {
@@ -216,18 +216,6 @@ const CoursesPage: React.FC = () => {
     </BaseLayout>
   );
 };
-
-const LoadingScreen = () => (
-  <BaseLayout>
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-8 mb-6 animate-pulse">
-        <div className="h-8 w-1/3 bg-gray-200 rounded mb-4"></div>
-        <div className="h-4 w-1/2 bg-gray-100 rounded"></div>
-      </div>
-      <div className="h-64 bg-gray-100 rounded-xl animate-pulse"></div>
-    </div>
-  </BaseLayout>
-);
 
 interface CourseSkeletonsProps {
   count: number;

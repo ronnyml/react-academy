@@ -105,3 +105,17 @@ export interface StatCardProps {
 export interface BaseLayoutProps {
   children: ReactNode;
 }
+
+export interface Settings {
+  id: number;
+  name: string;
+  email: string;
+  website?: string;
+  themeColor?: string;
+  logoUrl?: string;
+  defaultLanguage?: string;
+  timezone?: string;
+  featuresEnabled?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
