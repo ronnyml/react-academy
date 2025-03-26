@@ -4,6 +4,13 @@
   "search": "Search",
   "of": "of",
   "loading": "Loading",
+  "edit": "Edit",
+  "cancel": "Cancel",
+  "save": "Save",
+  "updated": "Updated",
+  "updatedDescription": "Information has been successfully updated.",
+  "updateFailed": "Updated failed",
+  "updateFailedDescription": "There was an error updating the information.",
   "errorLoading": "Error loading data. Please try again later.",
   "notFound": "No results found. Try adjusting your search or filters.",
   "sidebar": {
@@ -54,10 +61,10 @@
   },
   "courses": {
     "title": "Courses",
-    "allCourses": "All Courses",
+    "allCourses": "All courses",
     "subtitle": "Browse all available courses",
     "browse": "Browse",
-    "searchResults": "Search Results for",
+    "searchResults": "Search results for",
     "showingCourses": "Showing courses matching",
     "searchCourses": "Search courses by name or description",
     "allCategories": "All Categories",
@@ -66,5 +73,17 @@
     "label": "courses",
     "featured": "Featured",
     "viewCourse": "View Course"
+  },
+  "settings": {
+    "title": "Settings",
+    "company": "Company",
+    "email": "Email",
+    "website": "Website",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "timezone": "Timezone",
+    "selectTimezone": "Select Timezone",
+    "themeColor": "Theme Color",
+    "enterHexColor": "Enter Hex Color"
   }
 }

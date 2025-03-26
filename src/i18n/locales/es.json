@@ -4,6 +4,13 @@
   "search": "Buscar",
   "of": "de",
   "loading": "Cargando",
+  "edit": "Editar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "updated": "Actualizado",
+  "updatedDescription": "La información ha sido actualizada con éxito.",
+  "updateFailed": "Error al actualizar",
+  "updateFailedDescription": "Hubo un error al actualizar la información.",
   "errorLoading": "Error al cargar datos. Por favor, intenta de nuevo más tarde.",
   "notFound": "No se encontraron resultados. Intenta ajustar tu búsqueda o filtros.",
   "sidebar": {
@@ -66,5 +73,17 @@
     "label": "cursos",
     "featured": "Destacado",
     "viewCourse": "Ver curso"
+  },
+  "settings": {
+    "title": "Configuración",
+    "company": "Empresa",
+    "email": "Correo electrónico",
+    "website": "Sitio web",
+    "language": "Idioma",
+    "selectLanguage": "Seleciona idioma",
+    "timezone": "Zona horaria",
+    "selectTimezone": "Seleciona zona horaria",
+    "themeColor": "Color de la apariencia",
+    "enterHexColor": "Ingrese el color en formato Hex"
   }
 }
